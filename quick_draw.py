@@ -17,7 +17,7 @@ def top_3_accuracy(y_true, y_pred):
 # %%
 from keras.models import load_model
 
-densenet_model = load_model('./cifar10-models/xception_accuracy_0.8062352942.hdf5', custom_objects={'top_3_accuracy': top_3_accuracy, 'top_k_categorical_accuracy': top_k_categorical_accuracy})
+densenet_model = load_model('../cifar10-models/xception_accuracy_0.8062352942.hdf5', custom_objects={'top_3_accuracy': top_3_accuracy, 'top_k_categorical_accuracy': top_k_categorical_accuracy})
 
 # %%
 BASE_SIZE = 256 # kích thước gốc của ảnh
