@@ -11,6 +11,51 @@ import os
 from keras.metrics import categorical_accuracy, top_k_categorical_accuracy, categorical_crossentropy
 
 # %%
+DP_DIR = '../input/small-simplified-quick-draw-doodle-challenge/train_simplified_divided'  # thư mục chứa dữ liệu
+
+BASE_SIZE = 256 # kích thước gốc của ảnh
+NCSVS = 100 # số lượng files csv mà chúng ta đã chia ở bước trên
+NCATS = 340 # số lượng category (số lớp mà chúng ta cần phân loại)
+STEPS = 1000 # số bước huấn luyện trong 1 epoch
+EPOCHS = 30 # số epochs huấn luyện
+size = 128 # kích thước ảnh training đầu vào
+batchsize = 32
+np.random.seed(seed=42) # cài đặt seed 
+tf.set_random_seed(seed=42) # cài đặt seed 
+
+# %%
+import ast
+
+# # owls = pd.read_csv('../input/quickdraw-doodle-recognition/train_simplified/owl.csv')
+# owls = pd.read_csv('./test.csv')
+# owls = pd.read_csv('./out_standard.csv')
+# # print(owls.columns)
+# # owls = owls[owls.recognized]
+# # owls['timestamp'] = pd.to_datetime(owls.timestamp)
+# # owls = owls.sort_values(by='timestamp', ascending=False)[-100:]
+# owls['drawing'] = owls['drawing'].apply(ast.literal_eval)
+
+owls.head()
+
+# %%
+# import matplotlib.pyplot as plt
+
+# n = 2
+# fig, axs = plt.subplots(nrows=n, ncols=n, sharex=True, sharey=True, figsize=(16, 10))
+
+# print(len(owls.drawing))
+# for i, drawing in enumerate(owls.drawing):
+#     ax = axs[i // n, i % n]
+#     print("i", i)
+#     print("i // n", i//n)
+#     print("i % n", i%n)
+#     for x, y in drawing:
+#         ax.plot(x, -np.array(y), lw=3)
+#     ax.axis('off')
+# fig.savefig('owls.png', dpi=200)
+# plt.show()
+
+# %%
 def top_3_accuracy(y_true, y_pred):
     return top_k_categorical_accuracy(y_true, y_pred, k=3)
 
@@ -62,8 +107,64 @@ def df_to_image_array_xd(df, size, lw=6, time_color=True):
     df['drawing'] = df['drawing'].apply(ast.literal_eval)
     x = np.zeros((len(df), size, size, 1))
     for i, raw_strokes in enumerate(df.drawing.values):
-        x[i, :, :, 0] = draw_cv2(raw_strokes, size=size, lw=lw, time_color=time_color)
+        temp = draw_cv2(raw_strokes, size=size, lw=lw, time_color=time_color)
+        x[i, :, :, 0] = temp
+        # plt.figure()
+        # plt.imshow(temp)
     x = preprocess_input(x).astype(np.float32)
     return x
+
+# %%
+test_df = pd.read_csv(os.path.join("./out_standard.csv"))
+test_drawing = df_to_image_array_xd(test_df, 128)
+print(test_drawing.shape)
+
+# %%
+# print(test_drawing)
+
+# %%
+predictions = densenet_model.predict(test_drawing)
+print(predictions.shape)
+
+# %%
+def f2cat(filename: str) -> str:
+    return filename.split('.')[0]
+
+class Simplified():
+    def __init__(self, input_path='./input'):
+        self.input_path = input_path
+
+    def list_all_categories(self):
+        files = os.listdir(os.path.join(self.input_path, 'train_simplified'))
+        return sorted([f2cat(f) for f in files], key=str.lower)
+
+    def read_training_csv(self, category, nrows=None, usecols=None, drawing_transform=False):
+        df = pd.read_csv(os.path.join(self.input_path, 'train_simplified', category + '.csv'),
+                         nrows=nrows, parse_dates=['timestamp'], usecols=usecols)
+        if drawing_transform:
+            df['drawing'] = df['drawing'].apply(json.loads)
+        return df
+
+# %%
+# Get categories
+s = Simplified('../quick-draw-doodle')
+NCSVS = 100
+categories = s.list_all_categories()
+print(len(categories))
+for i in range(len(categories)):
+    categories[i] = categories[i].replace(' ', '_')
+
+# %%
+# for i in categories:
+#     if i == 'house':
+#         print(i)
+
+# %%
+for i, prediction in enumerate(predictions):
+    top_3_predictions = prediction.argsort()[-3:][::-1]
+    # print(categories[top_3_predictions[0]] + ' ' + categories[top_3_predictions[1]] + ' ' + categories[top_3_predictions[2]])
+    print(categories[top_3_predictions[0]])
+    print(categories[top_3_predictions[1]])
+    print(categories[top_3_predictions[2]])
 
 # %%
