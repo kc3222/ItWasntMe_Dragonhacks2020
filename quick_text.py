@@ -58,6 +58,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         toolbar = self.addToolBar('Exit')
         toolbar.addAction(exitAction)
+        toolbar.addAction(doodleAction)
+        toolbar.addAction(writeAction)
 
 
         # self.setGeometry(300, 300, 350, 250)
@@ -88,7 +90,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # pen.setColor(QtGui.QColor('red'))
         # painter.setPen(pen)
         with open("out.csv", "a") as f:
-            f.write("\n")
+            f.write("-1, -1\n")
         w = self.selection_end[0] - self.selection_start[0]
         h = self.selection_end[1] - self.selection_start[1]
 
