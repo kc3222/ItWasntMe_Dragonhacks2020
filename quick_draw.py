@@ -26,34 +26,34 @@ tf.set_random_seed(seed=42) # cài đặt seed
 # %%
 import ast
 
-# owls = pd.read_csv('../input/quickdraw-doodle-recognition/train_simplified/owl.csv')
-owls = pd.read_csv('./test.csv')
-owls = pd.read_csv('./out_standard.csv')
-# print(owls.columns)
-# owls = owls[owls.recognized]
-# owls['timestamp'] = pd.to_datetime(owls.timestamp)
-# owls = owls.sort_values(by='timestamp', ascending=False)[-100:]
-owls['drawing'] = owls['drawing'].apply(ast.literal_eval)
+# # owls = pd.read_csv('../input/quickdraw-doodle-recognition/train_simplified/owl.csv')
+# owls = pd.read_csv('./test.csv')
+# owls = pd.read_csv('./out_standard.csv')
+# # print(owls.columns)
+# # owls = owls[owls.recognized]
+# # owls['timestamp'] = pd.to_datetime(owls.timestamp)
+# # owls = owls.sort_values(by='timestamp', ascending=False)[-100:]
+# owls['drawing'] = owls['drawing'].apply(ast.literal_eval)
 
 owls.head()
 
 # %%
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
-n = 2
-fig, axs = plt.subplots(nrows=n, ncols=n, sharex=True, sharey=True, figsize=(16, 10))
+# n = 2
+# fig, axs = plt.subplots(nrows=n, ncols=n, sharex=True, sharey=True, figsize=(16, 10))
 
-print(len(owls.drawing))
-for i, drawing in enumerate(owls.drawing):
-    ax = axs[i // n, i % n]
-    print("i", i)
-    print("i // n", i//n)
-    print("i % n", i%n)
-    for x, y in drawing:
-        ax.plot(x, -np.array(y), lw=3)
-    ax.axis('off')
-fig.savefig('owls.png', dpi=200)
-plt.show()
+# print(len(owls.drawing))
+# for i, drawing in enumerate(owls.drawing):
+#     ax = axs[i // n, i % n]
+#     print("i", i)
+#     print("i // n", i//n)
+#     print("i % n", i%n)
+#     for x, y in drawing:
+#         ax.plot(x, -np.array(y), lw=3)
+#     ax.axis('off')
+# fig.savefig('owls.png', dpi=200)
+# plt.show()
 
 # %%
 def top_3_accuracy(y_true, y_pred):
