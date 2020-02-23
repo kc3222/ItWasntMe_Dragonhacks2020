@@ -75,15 +75,20 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show()
 
     def start_doodling(self):
+        with open(STROKE_FILE, "w") as f:
+            f.write("")
         self.image.save(self.temp_file)
         self.doodling = True
 
     def start_writing(self):
         self.replace_image(self.temp_file)
+        with open(STROKE_FILE, "w") as f:
+            f.write("")
         self.doodling = False
 
     def classify(self):
-        # self.replace_image(self.temp_file)
+        if os.stat(STROKE_FILE).st_size == 0:
+            return
         result = combine_quickdraw()
         print(result)
         top = result[0]
@@ -91,10 +96,13 @@ class MainWindow(QtWidgets.QMainWindow):
         x1, y1, x2, y2 = find_bounding_box()
         rect = QRect(x1, y1, x2-x1, y2-y1)
         print(x1, y1, x2, y2)
+        self.replace_image(self.temp_file)
         self.insert_pic(pic_path, rect)
-
+        self.image.save(self.temp_file)
         with open(STROKE_FILE, "w") as f:
             f.write("")
+
+
 
     def save_image(self):
         # self.canvas.toImage().save("fire.png")
@@ -128,6 +136,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 return
             rect = QRect(QPoint(*self.selection_start),QPoint(*self.selection_end))
             self.insert_pic(pic_path, rect)
+            self.image.save(self.temp_file)
             # self.insert_pic(pic_path, self.selection_start[0], self.selection_start[1], w, h)
 
 
@@ -168,8 +177,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def replace_image(self, path):
         pic = QtGui.QPixmap(path)
-        canvasPainter = QPainter(self)
-        canvasPainter.drawImage(self.rect(), pic, pic.rect())
+        canvasPainter = QPainter(self.image)
+        canvasPainter.drawPixmap(self.rect(), pic)
+        self.update()
+        # canvasPainter.drawImage(self.rect(), pic, pic.rect())
+        # painter.drawPixmap(self.rect(), QPixmap("ninja.png"))
 
 def get_pic_by_name(name):
     name_dir = os.path.join(PIC_DIR, name)

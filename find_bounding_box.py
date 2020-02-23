@@ -17,7 +17,7 @@ import json
 
 # %%
 def find_min(x):
-    min_x = 255
+    min_x = float('inf')
     for i in x:
         if i == -1:
             continue
