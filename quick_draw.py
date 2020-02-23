@@ -149,9 +149,15 @@ class Simplified():
 
 # %%
 # Get categories
-s = Simplified('../quick-draw-doodle')
 NCSVS = 100
-categories = s.list_all_categories()
+# s = Simplified('../quick-draw-doodle')
+# categories = s.list_all_categories()
+# categories_df = pd.DataFrame()
+# categories_df['categories'] = [categories]
+# categories_df.to_csv('categories.csv', index=False)
+categories_df = pd.read_csv('./categories.csv')
+categories = ast.literal_eval(categories_df['categories'][0])
+# print(type(categories))
 # print(len(categories))
 for i in range(len(categories)):
     categories[i] = categories[i].replace(' ', '_')
