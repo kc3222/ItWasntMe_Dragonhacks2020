@@ -11,6 +11,7 @@ import time
 
 PIC_DIR = "images"
 ICON_DIR = "icons"
+STROKE_FILE = "out.csv"
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -48,6 +49,8 @@ class MainWindow(QtWidgets.QMainWindow):
         writeAction = QAction(QtGui.QIcon(os.path.join(ICON_DIR, "text_icon.png")), 'write', self)
         writeAction.triggered.connect(self.start_writing)
 
+        classifyAction = QAction(QtGui.QIcon(os.path.join(ICON_DIR, "star_icon.png")), 'doodle to real image', self)
+        classifyAction.triggered.connect(self.classify)
 
         self.statusBar()
 
@@ -57,9 +60,9 @@ class MainWindow(QtWidgets.QMainWindow):
         fileMenu.addAction(saveAction)
 
         toolbar = self.addToolBar('Exit')
-        toolbar.addAction(exitAction)
         toolbar.addAction(doodleAction)
         toolbar.addAction(writeAction)
+        toolbar.addAction(classifyAction)
 
 
         # self.setGeometry(300, 300, 350, 250)
@@ -70,6 +73,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def start_writing(self):
         self.doodling = False
+
+    def classify(self):
+        with open(STROKE_FILE, "w") as f:
+            f.write("")
+        return
 
     def save_image(self):
         # self.canvas.toImage().save("fire.png")
@@ -84,7 +92,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def mouseReleaseEvent(self, e):
         if self.doodling:
-            with open("out.csv", "a") as f:
+            with open(STROKE_FILE, "a") as f:
                 f.write("-1, -1\n")
         else:
             self.selection_end = (e.x(), e.y())
@@ -132,7 +140,7 @@ class MainWindow(QtWidgets.QMainWindow):
             painter.drawPoint(e.x(), e.y(), )
             if time.time() - self.time > 0.2:
                 self.time = time.time()
-                with open("out.csv", "a") as f:
+                with open(STROKE_FILE, "a") as f:
                     f.write(f"{e.x()}, {e.y()}\n")
             painter.end()
             self.update()
