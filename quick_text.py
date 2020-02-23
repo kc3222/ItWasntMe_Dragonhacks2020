@@ -238,6 +238,8 @@ def get_pic_by_name(name):
     return img
 
 def get_pic_path_by_name(name):
+    if name is None:
+        return
     name_dir = os.path.join(PIC_DIR, name)
     if not os.path.isdir(name_dir):
         print(f"{name} is not yet supported")
