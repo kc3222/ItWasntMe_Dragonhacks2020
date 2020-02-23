@@ -110,9 +110,9 @@ def df_to_image_array_xd(df, size, lw=6, time_color=True):
         temp = draw_cv2(raw_strokes, size=size, lw=lw, time_color=time_color)
         x[i, :, :, 0] = temp
         print('Hello')
-        plt.figure()
-        plt.imshow(temp)
-        plt.show()
+        # plt.figure()
+        # plt.imshow(temp)
+        # plt.show()
     x = preprocess_input(x).astype(np.float32)
     return x
 

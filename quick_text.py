@@ -14,6 +14,7 @@ sys.path.insert(2, './fast-style-transfer-master/src')
 from evaluate import ffwd_to_img
 from combine_quickdraw import combine_quickdraw
 from find_bounding_box import find_bounding_box
+import random
 
 PIC_DIR = "images"
 ICON_DIR = "icons"
@@ -41,6 +42,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.doodling = True
         self.temp_file = os.path.join(TEMP_DIR, "temp.jpg")
         self.image.save(self.temp_file)
+        self.types = self.get_available_objects()
 
         # self.setWindowTitle("Write a painting")
 
@@ -85,11 +87,15 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.setGeometry(300, 300, 350, 250)
         self.show()
 
+    def get_available_objects(self):
+        return os.listdir(PIC_DIR)
+
     def beautify(self):
         self.image.save(self.temp_file)
         out_path = os.path.join(OUTPUT_DIR, "out.jpg")
-        ffwd_to_img(self.temp_file, out_path,'wave.ckpt')
-        # self.replace_image(out_path)
+        style_path = os.path.join("styles", random.choice(os.listdir("styles")))
+        ffwd_to_img(self.temp_file, out_path, style_path)
+        self.replace_image(out_path)
 
     def start_doodling(self):
         with open(STROKE_FILE, "w") as f:
@@ -107,8 +113,13 @@ class MainWindow(QtWidgets.QMainWindow):
         if os.stat(STROKE_FILE).st_size == 0:
             return
         result = combine_quickdraw()
+        top = self.get_best_result(result)
         print(result)
-        top = result[0]
+        if top is None:
+            self.replace_image(self.temp_file)
+            with open(STROKE_FILE, "w") as f:
+                f.write("")
+            return
         pic_path = get_pic_path_by_name(top)
         x1, y1, x2, y2 = find_bounding_box()
         rect = QRect(x1, y1, x2-x1, y2-y1)
@@ -119,6 +130,11 @@ class MainWindow(QtWidgets.QMainWindow):
         with open(STROKE_FILE, "w") as f:
             f.write("")
 
+    def get_best_result(self, result):
+        for c in result:
+            if c in self.types:
+                return c
+        return
 
 
     def save_image(self):
@@ -206,6 +222,7 @@ class MainWindow(QtWidgets.QMainWindow):
         canvasPainter = QPainter(self)
         canvasPainter.drawImage(self.rect(), self.image, self.image.rect())
         self.update()
+        self.image.save(self.temp_file)
 
 
 def get_pic_by_name(name):
