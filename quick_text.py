@@ -121,6 +121,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 f.write("")
             return
         pic_path = get_pic_path_by_name(top)
+        print('Pic path:', pic_path)
         x1, y1, x2, y2 = find_bounding_box()
         rect = QRect(x1, y1, x2-x1, y2-y1)
         print(x1, y1, x2, y2)
@@ -227,7 +228,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
 def get_pic_by_name(name):
     name_dir = os.path.join(PIC_DIR, name)
-    file = os.listdir(name_dir)[0]
+    file = None
+    for f in os.listdir(name_dir): 
+        # print('File:', f)
+        if f.split('.')[-1] in ["jpg", "png", "jpeg"]:
+            file = f
+            break
     img = cv2.imread(os.path.join(name_dir,file))
     return img
 
@@ -236,7 +242,12 @@ def get_pic_path_by_name(name):
     if not os.path.isdir(name_dir):
         print(f"{name} is not yet supported")
         return
-    file = os.listdir(name_dir)[0]
+    file = None
+    for f in os.listdir(name_dir): 
+        # print('File:', f)
+        if f.split('.')[-1] in ["jpg", "png", "jpeg"]:
+            file = f
+            break
     return os.path.join(name_dir,file)
 
 if __name__ == "__main__":
