@@ -26,7 +26,7 @@ OUTPUT_DIR = "outputs"
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Write a painting")
+        self.setWindowTitle("Write A Painting")
         self.setGeometry(300, 300, 800, 600)
         # self.label = QtWidgets.QLabel()
         # self.canvas = QtGui.QPixmap(800, 600)
