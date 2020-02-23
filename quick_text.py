@@ -4,6 +4,7 @@ from PyQt5 import QtGui
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtCore import Qt
 import sys
+import time
 
 PIC_DIR = "images"
 
@@ -21,6 +22,7 @@ class MainWindow(QtWidgets.QMainWindow):
         canvas = QtGui.QPixmap(800, 600)
         self.label.setPixmap(canvas)
         self.setCentralWidget(self.label)
+        self.time = time.time()
         #self.draw_something()
 
     def draw_something(self):
@@ -35,6 +37,10 @@ class MainWindow(QtWidgets.QMainWindow):
         pen.setColor(QtGui.QColor('red'))
         painter.setPen(pen)
         painter.drawPoint(e.x(), e.y(), )
+        if time.time() - self.time > 0.2:
+            self.time = time.time()
+            with open("out.csv", "a") as f:
+                f.write(f"{e.x()}, {e.y()}\n")
         painter.end()
         self.update()
 
