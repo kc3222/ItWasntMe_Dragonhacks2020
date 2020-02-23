@@ -26,19 +26,19 @@ tf.set_random_seed(seed=42) # cài đặt seed
 # %%
 import ast
 
-# # owls = pd.read_csv('../input/quickdraw-doodle-recognition/train_simplified/owl.csv')
-# owls = pd.read_csv('./test.csv')
-# owls = pd.read_csv('./out_standard.csv')
-# # print(owls.columns)
-# # owls = owls[owls.recognized]
-# # owls['timestamp'] = pd.to_datetime(owls.timestamp)
-# # owls = owls.sort_values(by='timestamp', ascending=False)[-100:]
-# owls['drawing'] = owls['drawing'].apply(ast.literal_eval)
+# owls = pd.read_csv('../input/quickdraw-doodle-recognition/train_simplified/owl.csv')
+owls = pd.read_csv('./test.csv')
+owls = pd.read_csv('./out_standard.csv')
+# print(owls.columns)
+# owls = owls[owls.recognized]
+# owls['timestamp'] = pd.to_datetime(owls.timestamp)
+# owls = owls.sort_values(by='timestamp', ascending=False)[-100:]
+owls['drawing'] = owls['drawing'].apply(ast.literal_eval)
 
 owls.head()
 
 # %%
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 # n = 2
 # fig, axs = plt.subplots(nrows=n, ncols=n, sharex=True, sharey=True, figsize=(16, 10))
@@ -109,22 +109,24 @@ def df_to_image_array_xd(df, size, lw=6, time_color=True):
     for i, raw_strokes in enumerate(df.drawing.values):
         temp = draw_cv2(raw_strokes, size=size, lw=lw, time_color=time_color)
         x[i, :, :, 0] = temp
-        # plt.figure()
-        # plt.imshow(temp)
+        print('Hello')
+        plt.figure()
+        plt.imshow(temp)
+        plt.show()
     x = preprocess_input(x).astype(np.float32)
     return x
 
 # %%
-test_df = pd.read_csv(os.path.join("./out_standard.csv"))
-test_drawing = df_to_image_array_xd(test_df, 128)
-print(test_drawing.shape)
+# test_df = pd.read_csv(os.path.join("./out_standard.csv"))
+# test_drawing = df_to_image_array_xd(test_df, 128)
+# print(test_drawing.shape)
 
 # %%
 # print(test_drawing)
 
 # %%
-predictions = densenet_model.predict(test_drawing)
-print(predictions.shape)
+# predictions = densenet_model.predict(test_drawing)
+# print(predictions.shape)
 
 # %%
 def f2cat(filename: str) -> str:
@@ -150,7 +152,7 @@ class Simplified():
 s = Simplified('../quick-draw-doodle')
 NCSVS = 100
 categories = s.list_all_categories()
-print(len(categories))
+# print(len(categories))
 for i in range(len(categories)):
     categories[i] = categories[i].replace(' ', '_')
 
@@ -160,11 +162,21 @@ for i in range(len(categories)):
 #         print(i)
 
 # %%
-for i, prediction in enumerate(predictions):
-    top_3_predictions = prediction.argsort()[-3:][::-1]
-    # print(categories[top_3_predictions[0]] + ' ' + categories[top_3_predictions[1]] + ' ' + categories[top_3_predictions[2]])
-    print(categories[top_3_predictions[0]])
-    print(categories[top_3_predictions[1]])
-    print(categories[top_3_predictions[2]])
+# for i, prediction in enumerate(predictions):
+#     top_3_predictions = prediction.argsort()[-3:][::-1]
+#     # print(categories[top_3_predictions[0]] + ' ' + categories[top_3_predictions[1]] + ' ' + categories[top_3_predictions[2]])
+#     print(categories[top_3_predictions[0]])
+#     print(categories[top_3_predictions[1]])
+#     print(categories[top_3_predictions[2]])
 
 # %%
+def predict_image():
+    test_df = pd.read_csv(os.path.join("./out_standard.csv"))
+    test_drawing = df_to_image_array_xd(test_df, 128)
+    predictions = densenet_model.predict(test_drawing)
+
+    for i, prediction in enumerate(predictions):
+        top_3_predictions = prediction.argsort()[-3:][::-1]
+    return [categories[top_3_predictions[0]], categories[top_3_predictions[1]], categories[top_3_predictions[2]]]
+
+# print(predict_image())

@@ -40,4 +40,6 @@ def find_bounding_box():
     max_x = max(x)
     min_y = find_min(x)
     max_y = max(y)
-    return min_x, max_x, min_y, max_y
+    return min_x, min_y, max_x, max_y
+
+print(find_bounding_box())

@@ -12,9 +12,9 @@ import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 # For example, running this (by clicking run or pressing Shift+Enter) will list the files in the input directory
 
 import os
-print(os.listdir("../input"))
-print(os.listdir("../input/style-transfer"))
-print(os.listdir("../input/deepdream"))
+# print(os.listdir("../input"))
+# print(os.listdir("../input/style-transfer"))
+# print(os.listdir("../input/deepdream"))
 # Any results you write to the current directory are saved as output.
 
 
@@ -37,45 +37,45 @@ from keras.models import Model
 from scipy.optimize import fmin_l_bfgs_b
 from scipy.misc import imsave
 
-content_image=Image.open('../input/deepdream/Ireland.NorthernIReland.CarrickaRede.SS_.jpg')
-content_image=content_image.resize((512,512))
-style_image= Image.open('../input/style-transfer/style.png')
-style_image=style_image.resize((512,512))
+# content_image=Image.open('../input/deepdream/Ireland.NorthernIReland.CarrickaRede.SS_.jpg')
+# content_image=content_image.resize((512,512))
+# style_image= Image.open('../input/style-transfer/style.png')
+# style_image=style_image.resize((512,512))
 
-content_array=np.asarray(content_image,dtype='float32')
-content_array=np.expand_dims(content_array,axis=0)
+# content_array=np.asarray(content_image,dtype='float32')
+# content_array=np.expand_dims(content_array,axis=0)
 
-style_array=np.asarray(style_image,dtype='float32')
-style_array=np.expand_dims(style_array,axis=0)
+# style_array=np.asarray(style_image,dtype='float32')
+# style_array=np.expand_dims(style_array,axis=0)
 
-content_array[:, :, :, 0] -= 103.939
-content_array[:, :, :, 1] -= 116.779
-content_array[:, :, :, 2] -= 123.68
-content_array=content_array[:, :, :, ::-1]
+# content_array[:, :, :, 0] -= 103.939
+# content_array[:, :, :, 1] -= 116.779
+# content_array[:, :, :, 2] -= 123.68
+# content_array=content_array[:, :, :, ::-1]
 
-style_array[:, :, :, 0] -= 103.939
-style_array[:, :, :, 1] -= 116.779
-style_array[:, :, :, 2] -= 123.68
-style_array=style_array[:, :, :, ::-1]
-style_array.shape
+# style_array[:, :, :, 0] -= 103.939
+# style_array[:, :, :, 1] -= 116.779
+# style_array[:, :, :, 2] -= 123.68
+# style_array=style_array[:, :, :, ::-1]
+# style_array.shape
 
-height=512
-width=512
-content_image=backend.variable(content_array)
-style_image=backend.variable(style_array)
-combination_image=backend.placeholder((1,height,width,3))
+# height=512
+# width=512
+# content_image=backend.variable(content_array)
+# style_image=backend.variable(style_array)
+# combination_image=backend.placeholder((1,height,width,3))
 
-input_tensor=backend.concatenate([content_image,style_image,combination_image],axis=0)
+# input_tensor=backend.concatenate([content_image,style_image,combination_image],axis=0)
 
-model=VGG16(input_tensor=input_tensor,weights='imagenet', include_top=False)
+# model=VGG16(input_tensor=input_tensor,weights='imagenet', include_top=False)
 
-content_weight = 0.05
-style_weight = 5.0
-total_variation_weight = 1.0
+# content_weight = 0.05
+# style_weight = 5.0
+# total_variation_weight = 1.0
 
-layers=dict([(layer.name, layer.output) for layer in model.layers])
+# layers=dict([(layer.name, layer.output) for layer in model.layers])
 
-loss=backend.variable(0.)
+# loss=backend.variable(0.)
 
 def content_loss(content, combination):
     return backend.sum(backend.square(content-combination))
@@ -152,7 +152,7 @@ class Evaluator(object):
     
 evaluator=Evaluator()
 
-x=np.random.uniform(0,255,(1,height,width,3))-128.0
+# x=np.random.uniform(0,255,(1,height,width,3))-128.0
 
 iterations = 10
 
@@ -166,14 +166,14 @@ for i in range(iterations):
     end_time = time.time()
     print('Iteration %d completed in %ds' % (i, end_time - start_time))
     
-x = x.reshape((height, width, 3))
-x = x[:, :, ::-1]
-x[:, :, 0] += 103.939
-x[:, :, 1] += 116.779
-x[:, :, 2] += 123.68
-x = np.clip(x, 0, 255).astype('uint8')
+# x = x.reshape((height, width, 3))
+# x = x[:, :, ::-1]
+# x[:, :, 0] += 103.939
+# x[:, :, 1] += 116.779
+# x[:, :, 2] += 123.68
+# x = np.clip(x, 0, 255).astype('uint8')
 
-Image.fromarray(x)
+# Image.fromarray(x)
 
 
 # %%
@@ -181,8 +181,8 @@ Image.fromarray(x)
 """Defining initial variables"""
 from keras.preprocessing.image import load_img, img_to_array
 
-target_image_path = '../input/style-transfer/test_transfer.png'
-style_reference_image_path = '../input/style-transfer/style.png'
+target_image_path = './style-transfer/test_transfer.png'
+style_reference_image_path = './style-transfer/style.png'
 
 # Dimensions of the generated picture
 width, height = load_img(target_image_path).size
