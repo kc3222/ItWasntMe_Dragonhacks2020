@@ -83,24 +83,27 @@ class MainWindow(QtWidgets.QMainWindow):
         self.selection_start = (e.x(), e.y())
 
     def mouseReleaseEvent(self, e):
-        self.selection_end = (e.x(), e.y())
-        # painter = QtGui.QPainter(self.label.pixmap())
-        # pen = QtGui.QPen()
-        # pen.setWidth(10)
-        # pen.setColor(QtGui.QColor('red'))
-        # painter.setPen(pen)
-        with open("out.csv", "a") as f:
-            f.write("-1, -1\n")
-        w = self.selection_end[0] - self.selection_start[0]
-        h = self.selection_end[1] - self.selection_start[1]
+        if self.doodling:
+            with open("out.csv", "a") as f:
+                f.write("-1, -1\n")
+        else:
+            self.selection_end = (e.x(), e.y())
+            # painter = QtGui.QPainter(self.label.pixmap())
+            # pen = QtGui.QPen()
+            # pen.setWidth(10)
+            # pen.setColor(QtGui.QColor('red'))
+            # painter.setPen(pen)
 
-        self.getText()
-        pic_path = get_pic_path_by_name(self.obj_name)
-        if pic_path is None:
-            return
-        rect = QRect(QPoint(*self.selection_start),QPoint(*self.selection_end))
-        self.insert_pic(pic_path, rect)
-        # self.insert_pic(pic_path, self.selection_start[0], self.selection_start[1], w, h)
+            w = self.selection_end[0] - self.selection_start[0]
+            h = self.selection_end[1] - self.selection_start[1]
+
+            self.getText()
+            pic_path = get_pic_path_by_name(self.obj_name)
+            if pic_path is None:
+                return
+            rect = QRect(QPoint(*self.selection_start),QPoint(*self.selection_end))
+            self.insert_pic(pic_path, rect)
+            # self.insert_pic(pic_path, self.selection_start[0], self.selection_start[1], w, h)
 
 
     def getText(self):
@@ -119,19 +122,20 @@ class MainWindow(QtWidgets.QMainWindow):
         self.update()
 
     def mouseMoveEvent(self, e):
-        # painter = QtGui.QPainter(self.label.pixmap())
-        painter = QtGui.QPainter(self.image)
-        pen = QtGui.QPen()
-        pen.setWidth(10)
-        pen.setColor(QtGui.QColor('red'))
-        painter.setPen(pen)
-        painter.drawPoint(e.x(), e.y(), )
-        if time.time() - self.time > 0.2:
-            self.time = time.time()
-            with open("out.csv", "a") as f:
-                f.write(f"{e.x()}, {e.y()}\n")
-        painter.end()
-        self.update()
+        if self.doodling:
+            # painter = QtGui.QPainter(self.label.pixmap())
+            painter = QtGui.QPainter(self.image)
+            pen = QtGui.QPen()
+            pen.setWidth(10)
+            pen.setColor(QtGui.QColor('red'))
+            painter.setPen(pen)
+            painter.drawPoint(e.x(), e.y(), )
+            if time.time() - self.time > 0.2:
+                self.time = time.time()
+                with open("out.csv", "a") as f:
+                    f.write(f"{e.x()}, {e.y()}\n")
+            painter.end()
+            self.update()
 
     def paintEvent(self, e):
         canvasPainter = QPainter(self)
