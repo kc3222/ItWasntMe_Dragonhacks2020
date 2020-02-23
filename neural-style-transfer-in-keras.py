@@ -35,7 +35,8 @@ from keras.applications.vgg16 import preprocess_input,decode_predictions
 from keras import backend
 from keras.models import Model
 from scipy.optimize import fmin_l_bfgs_b
-from scipy.misc import imsave
+# from scipy.misc import imsave
+import cv2
 
 
 # %%
@@ -47,7 +48,8 @@ target_image_path = './style-transfer/test_transfer.png'
 style_reference_image_path = './style-transfer/style.png'
 
 # Dimensions of the generated picture
-width, height = load_img(target_image_path).size
+# width, height = load_img(target_image_path).size
+width, height = cv2.imread(target_image_path).shape[:2]
 img_height = 400
 img_width = int(width * img_height / height)
 
@@ -57,7 +59,10 @@ import numpy as np
 from keras.applications import vgg16
 
 def preprocess_image(image_path):
-    img = load_img(image_path, target_size=(img_height, img_width))
+    # img = load_img(image_path, target_size=(img_height, img_width))
+    img = cv2.imread(image_path)
+    img = cv2.resize(img, (img_width, img_height))
+    img = img[:,:,::-1]
     img = img_to_array(img)
     img = np.expand_dims(img, axis=0)
     img = vgg16.preprocess_input(img)
@@ -188,7 +193,7 @@ evaluator = Evaluator()
 # %%
 """Style-transfer loop"""
 from scipy.optimize import fmin_l_bfgs_b
-from scipy.misc import imsave
+# from scipy.misc import imsave
 import time
 
 result_prefix = 'my_result'
@@ -204,7 +209,9 @@ for i in range(iterations):
     img = x.copy().reshape((img_height, img_width, 3))
     img = deprocess_image(img)
     fname = result_prefix + '_at_iteration%d.png' % i
-    imsave(fname, img)
+
+    # imsave(fname, img)
+    cv2.imwrite(fname, img[:,:,::-1])
     print('Image saved as', fname)
     end_time = time.time()
     print('Iteration %d completed in %ds' % (i, end_time - start_time))

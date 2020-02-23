@@ -58,8 +58,13 @@ class MainWindow(QtWidgets.QMainWindow):
         classifyAction = QAction(QtGui.QIcon(os.path.join(ICON_DIR, "star_icon.png")), 'doodle to real image', self)
         classifyAction.triggered.connect(self.classify)
 
-        self.statusBar()
+        beautifyAction = QAction(QtGui.QIcon(os.path.join(ICON_DIR, "mona_icon.png")), 'turn into artwork', self)
+        beautifyAction.triggered.connect(self.beautify)
 
+        clearAction = QAction(QtGui.QIcon(os.path.join(ICON_DIR, "new_icon.png")), 'blank canvas', self)
+        clearAction.triggered.connect(self.clear)
+
+        self.statusBar()
 
         fileMenu = menubar.addMenu('&File')
         fileMenu.addAction(exitAction)
@@ -69,10 +74,13 @@ class MainWindow(QtWidgets.QMainWindow):
         toolbar.addAction(doodleAction)
         toolbar.addAction(writeAction)
         toolbar.addAction(classifyAction)
-
+        toolbar.addAction(beautifyAction)
 
         # self.setGeometry(300, 300, 350, 250)
         self.show()
+
+    def beautify(self):
+        return
 
     def start_doodling(self):
         with open(STROKE_FILE, "w") as f:
@@ -182,6 +190,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.update()
         # canvasPainter.drawImage(self.rect(), pic, pic.rect())
         # painter.drawPixmap(self.rect(), QPixmap("ninja.png"))
+
+    def clear(self):
+        return
 
 def get_pic_by_name(name):
     name_dir = os.path.join(PIC_DIR, name)
