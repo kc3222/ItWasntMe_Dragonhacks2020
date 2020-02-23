@@ -8,6 +8,10 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import Qt, QPoint, QRect
 import sys
 import time
+import sys
+sys.path.insert(1, './fast-style-transfer-master')
+sys.path.insert(2, './fast-style-transfer-master/src')
+from evaluate import ffwd_to_img
 from combine_quickdraw import combine_quickdraw
 from find_bounding_box import find_bounding_box
 
@@ -15,6 +19,7 @@ PIC_DIR = "images"
 ICON_DIR = "icons"
 STROKE_FILE = "out.csv"
 TEMP_DIR = "temp"
+OUTPUT_DIR = "outputs"
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -34,7 +39,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.selection_end = None
         self.obj_name = None
         self.doodling = True
-        self.temp_file = os.path.join(TEMP_DIR, "temp.png")
+        self.temp_file = os.path.join(TEMP_DIR, "temp.jpg")
         self.image.save(self.temp_file)
 
         # self.setWindowTitle("Write a painting")
@@ -71,6 +76,7 @@ class MainWindow(QtWidgets.QMainWindow):
         fileMenu.addAction(saveAction)
 
         toolbar = self.addToolBar('Exit')
+        toolbar.addAction(clearAction)
         toolbar.addAction(doodleAction)
         toolbar.addAction(writeAction)
         toolbar.addAction(classifyAction)
@@ -80,7 +86,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show()
 
     def beautify(self):
-        return
+        self.image.save(self.temp_file)
+        out_path = os.path.join(OUTPUT_DIR, "out.jpg")
+        ffwd_to_img(self.temp_file, out_path,'wave.ckpt')
+        # self.replace_image(out_path)
 
     def start_doodling(self):
         with open(STROKE_FILE, "w") as f:
@@ -192,7 +201,12 @@ class MainWindow(QtWidgets.QMainWindow):
         # painter.drawPixmap(self.rect(), QPixmap("ninja.png"))
 
     def clear(self):
-        return
+        self.image = QImage(self.size(), QImage.Format_RGB32)
+        self.image.fill(Qt.white)
+        canvasPainter = QPainter(self)
+        canvasPainter.drawImage(self.rect(), self.image, self.image.rect())
+        self.update()
+
 
 def get_pic_by_name(name):
     name_dir = os.path.join(PIC_DIR, name)

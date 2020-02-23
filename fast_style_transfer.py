@@ -7,4 +7,4 @@ import os
 
 from evaluate import ffwd_to_img
 
-ffwd_to_img('./fast-style-transfer-master/portrait.jpg', './fast-style-transfer-master/styled_out/portrait.jpg', './fast-style-transfer-master/Fast\ Style\ Transfer\ Models/wave.ckpt')
+ffwd_to_img('voila/sharingan dog.png', 'portrait.jpg', 'wave.ckpt')
