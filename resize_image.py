@@ -88,8 +88,8 @@ def reshape(x, y):
 # new_df.to_csv('new_out.csv', header=False, index=False)
 
 # %%
-def resize_image():
-    df = pd.read_csv('./out.csv', header=None)
+def resize_image(inpath, outpath):
+    df = pd.read_csv(inpath, header=None)
 
     x = []
     y = []
@@ -103,4 +103,4 @@ def resize_image():
     new_df['X'] = x
     new_df['Y'] = y
 
-    new_df.to_csv('new_out.csv', header=False, index=False)
+    new_df.to_csv(outpath, header=False, index=False)

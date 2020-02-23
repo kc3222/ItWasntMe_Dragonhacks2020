@@ -176,8 +176,8 @@ for i in range(len(categories)):
 #     print(categories[top_3_predictions[2]])
 
 # %%
-def predict_image():
-    test_df = pd.read_csv(os.path.join("./out_standard.csv"))
+def predict_image(path):
+    test_df = pd.read_csv(os.path.join(path))
     test_drawing = df_to_image_array_xd(test_df, 128)
     predictions = densenet_model.predict(test_drawing)
 

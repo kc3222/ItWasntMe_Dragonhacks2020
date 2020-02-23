@@ -29,8 +29,8 @@ import json
 # new_df.to_csv('out_standard.csv', index=False)
 
 # %%
-def convert_out_to_standard():
-    df = pd.read_csv('./new_out.csv', header=None)
+def convert_out_to_standard(inpath, outpath):
+    df = pd.read_csv(inpath, header=None)
 
     all_x_y = []
     x = []
@@ -47,4 +47,4 @@ def convert_out_to_standard():
     
     new_df = pd.DataFrame()
     new_df['drawing'] = [all_x_y, all_x_y]
-    new_df.to_csv('out_standard.csv', index=False)
+    new_df.to_csv(outpath, index=False)

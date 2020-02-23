@@ -15,9 +15,11 @@ from evaluate import ffwd_to_img
 from combine_quickdraw import combine_quickdraw
 from find_bounding_box import find_bounding_box
 import random
+import shutil
 
 PIC_DIR = "images"
 ICON_DIR = "icons"
+STROKE_DIR = "strokes"
 STROKE_FILE = "out.csv"
 TEMP_DIR = "temp"
 OUTPUT_DIR = "outputs"
@@ -26,6 +28,7 @@ OUTPUT_DIR = "outputs"
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
+        self.id = 0
         self.setWindowTitle("Write A Painting")
         self.setGeometry(300, 300, 800, 600)
         # self.label = QtWidgets.QLabel()
@@ -40,9 +43,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.selection_end = None
         self.obj_name = None
         self.doodling = True
-        self.temp_file = os.path.join(TEMP_DIR, "temp.jpg")
-        self.image.save(self.temp_file)
+        # self.temp_file = os.path.join(TEMP_DIR, "temp.jpg")
+        self.image.save(self.get_temp_file())
+        shutil.copyfile(STROKE_FILE, os.path.join(STROKE_DIR, f"out_{self.id}.csv")) 
         self.types = self.get_available_objects()
+        self.start_doodle_id = self.id
+        
 
         # self.setWindowTitle("Write a painting")
 
@@ -71,6 +77,10 @@ class MainWindow(QtWidgets.QMainWindow):
         clearAction = QAction(QtGui.QIcon(os.path.join(ICON_DIR, "new_icon.png")), 'blank canvas', self)
         clearAction.triggered.connect(self.clear)
 
+        undoAction = QAction(QtGui.QIcon(os.path.join(ICON_DIR, "undo_icon.png")), 'undo', self)
+        undoAction.setShortcut('Ctrl+Z')
+        undoAction.triggered.connect(self.undo)
+
         self.statusBar()
 
         fileMenu = menubar.addMenu('&File')
@@ -83,6 +93,7 @@ class MainWindow(QtWidgets.QMainWindow):
         toolbar.addAction(writeAction)
         toolbar.addAction(classifyAction)
         toolbar.addAction(beautifyAction)
+        toolbar.addAction(undoAction)
 
         self.combo = QComboBox()
         toolbar.addWidget(self.combo)
@@ -103,6 +114,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def get_available_objects(self):
         return os.listdir(PIC_DIR)
 
+    def get_temp_file(self):
+        return os.path.join(TEMP_DIR, f"temp_{self.id}.jpg")
+
     def get_styles(self):
         res = []
         for f in os.listdir("styles"):
@@ -111,22 +125,37 @@ class MainWindow(QtWidgets.QMainWindow):
         return res
 
     def beautify(self):
-        self.image.save(self.temp_file)
+        self.temp_save()
         out_path = os.path.join(OUTPUT_DIR, "out.jpg")
         style = self.combo.currentText()
         style_path = os.path.join("styles", style+".ckpt")
-        ffwd_to_img(self.temp_file, out_path, style_path)
+        ffwd_to_img(self.get_temp_file(), out_path, style_path)
         self.replace_image(out_path)
+
+    def temp_save(self):
+        self.id += 1
+        self.image.save(self.get_temp_file())
+        shutil.copyfile(STROKE_FILE, os.path.join(STROKE_DIR, f"out_{self.id}.csv"))
+
+    def undo(self):
+        if self.id == 0:
+            return
+        self.id -= 1
+        print(self.get_temp_file())
+        self.replace_image(self.get_temp_file())
+        shutil.copyfile(os.path.join(STROKE_DIR, f"out_{self.id}.csv"), STROKE_FILE) 
+
 
     def start_doodling(self):
         with open(STROKE_FILE, "w") as f:
             f.write("")
-        self.image.save(self.temp_file)
+        self.temp_save()
+        self.start_doodle_id = self.id
         self.doodling = True
 
     def start_writing(self):
         print(self.combo.currentText())
-        self.replace_image(self.temp_file)
+        self.replace_image(self.get_temp_file())
         with open(STROKE_FILE, "w") as f:
             f.write("")
         self.doodling = False
@@ -134,11 +163,11 @@ class MainWindow(QtWidgets.QMainWindow):
     def classify(self):
         if os.stat(STROKE_FILE).st_size == 0:
             return
-        result = combine_quickdraw()
+        result = combine_quickdraw(STROKE_FILE)
         top = self.get_best_result(result)
         print(result)
         if top is None:
-            self.replace_image(self.temp_file)
+            self.replace_image(os.path.join(TEMP_DIR, f"temp_{self.start_doodle_id}.jpg"))
             with open(STROKE_FILE, "w") as f:
                 f.write("")
             return
@@ -147,9 +176,10 @@ class MainWindow(QtWidgets.QMainWindow):
         x1, y1, x2, y2 = find_bounding_box()
         rect = QRect(x1, y1, x2-x1, y2-y1)
         print(x1, y1, x2, y2)
-        self.replace_image(self.temp_file)
+        
+        self.replace_image(os.path.join(TEMP_DIR, f"temp_{self.start_doodle_id}.jpg"))
         self.insert_pic(pic_path, rect)
-        self.image.save(self.temp_file)
+        self.temp_save()
         with open(STROKE_FILE, "w") as f:
             f.write("")
 
@@ -175,6 +205,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.doodling:
             with open(STROKE_FILE, "a") as f:
                 f.write("-1, -1\n")
+            self.temp_save()
         else:
             self.selection_end = (e.x(), e.y())
             # painter = QtGui.QPainter(self.label.pixmap())
@@ -192,7 +223,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 return
             rect = QRect(QPoint(*self.selection_start),QPoint(*self.selection_end))
             self.insert_pic(pic_path, rect)
-            self.image.save(self.temp_file)
+            self.temp_save()
             # self.insert_pic(pic_path, self.selection_start[0], self.selection_start[1], w, h)
 
 
@@ -245,7 +276,7 @@ class MainWindow(QtWidgets.QMainWindow):
         canvasPainter = QPainter(self)
         canvasPainter.drawImage(self.rect(), self.image, self.image.rect())
         self.update()
-        self.image.save(self.temp_file)
+        self.temp_save()
 
     def get_style(self):
         return
