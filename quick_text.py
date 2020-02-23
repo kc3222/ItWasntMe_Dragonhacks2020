@@ -34,6 +34,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.selection_end = None
         self.obj_name = None
         self.doodling = True
+        self.temp_file = os.path.join(TEMP_DIR, "temp.png")
+        self.image.save(self.temp_file)
+
         # self.setWindowTitle("Write a painting")
 
         # exitAction = QAction(QtGui.QIcon('cat.png'), 'Exit', self)
@@ -72,20 +75,22 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show()
 
     def start_doodling(self):
+        self.image.save(self.temp_file)
         self.doodling = True
 
     def start_writing(self):
+        self.replace_image(self.temp_file)
         self.doodling = False
 
     def classify(self):
-        temp_path = os.path.join(TEMP_DIR, "temp.png")
-        self.image.save(temp_path)
+        # self.replace_image(self.temp_file)
         result = combine_quickdraw()
         print(result)
         top = result[0]
         pic_path = get_pic_path_by_name(top)
         x1, y1, x2, y2 = find_bounding_box()
         rect = QRect(x1, y1, x2-x1, y2-y1)
+        print(x1, y1, x2, y2)
         self.insert_pic(pic_path, rect)
 
         with open(STROKE_FILE, "w") as f:
@@ -160,6 +165,11 @@ class MainWindow(QtWidgets.QMainWindow):
     def paintEvent(self, e):
         canvasPainter = QPainter(self)
         canvasPainter.drawImage(self.rect(), self.image, self.image.rect())
+
+    def replace_image(self, path):
+        pic = QtGui.QPixmap(path)
+        canvasPainter = QPainter(self)
+        canvasPainter.drawImage(self.rect(), pic, pic.rect())
 
 def get_pic_by_name(name):
     name_dir = os.path.join(PIC_DIR, name)

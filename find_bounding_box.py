@@ -38,7 +38,7 @@ def find_bounding_box():
 
     min_x = find_min(x)
     max_x = max(x)
-    min_y = find_min(x)
+    min_y = find_min(y)
     max_y = max(y)
     return min_x, min_y, max_x, max_y
 
