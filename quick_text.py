@@ -2,7 +2,7 @@ import cv2
 import os
 from PyQt5 import QtGui
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
-from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QAction, QFileDialog
+from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QAction, QFileDialog, QListWidget, QListWidgetItem, QDialog, QComboBox
 from PyQt5.QtGui import QIcon
 from PyQt5.QtGui import *
 from PyQt5.QtCore import Qt, QPoint, QRect
@@ -84,16 +84,37 @@ class MainWindow(QtWidgets.QMainWindow):
         toolbar.addAction(classifyAction)
         toolbar.addAction(beautifyAction)
 
+        self.combo = QComboBox()
+        toolbar.addWidget(self.combo)
+        self.styles = self.get_styles()
+        self.combo.insertItems(1, self.styles)
+
+        # list = QListWidget()
+        # itm = QListWidgetItem("Tick")
+        # # itm.setIcon(QIcon(r"tick.png"))
+        # list.addItem(itm)
+        # list.addItem(QListWidgetItem("fire"))
+        # toolbar.addWidget(list)
+
+
         # self.setGeometry(300, 300, 350, 250)
         self.show()
 
     def get_available_objects(self):
         return os.listdir(PIC_DIR)
 
+    def get_styles(self):
+        res = []
+        for f in os.listdir("styles"):
+            if f.split(".")[-1] == "ckpt":
+                res.append(f.split(".")[0])
+        return res
+
     def beautify(self):
         self.image.save(self.temp_file)
         out_path = os.path.join(OUTPUT_DIR, "out.jpg")
-        style_path = os.path.join("styles", random.choice(os.listdir("styles")))
+        style = self.combo.currentText()
+        style_path = os.path.join("styles", style+".ckpt")
         ffwd_to_img(self.temp_file, out_path, style_path)
         self.replace_image(out_path)
 
@@ -104,6 +125,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.doodling = True
 
     def start_writing(self):
+        print(self.combo.currentText())
         self.replace_image(self.temp_file)
         with open(STROKE_FILE, "w") as f:
             f.write("")
@@ -224,6 +246,22 @@ class MainWindow(QtWidgets.QMainWindow):
         canvasPainter.drawImage(self.rect(), self.image, self.image.rect())
         self.update()
         self.image.save(self.temp_file)
+
+    def get_style(self):
+        return
+        # QInputDialog.comboBoxItems()
+        # window = QDialog(self)
+        # list = QListWidget(window)
+        # listWidget = QListWidget(list)
+        #
+        # QListWidgetItem("Geeks", listWidget)
+        # QListWidgetItem("For", listWidget)
+        # QListWidgetItem("Geeks", listWidget)
+        #
+        # listWidgetItem = QListWidgetItem("GeeksForGeeks")
+        # listWidget.addItem(listWidgetItem)
+        # self.update()
+        # self.window().add
 
 
 def get_pic_by_name(name):
