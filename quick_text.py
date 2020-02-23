@@ -8,10 +8,13 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import Qt, QPoint, QRect
 import sys
 import time
+from combine_quickdraw import combine_quickdraw
+from find_bounding_box import find_bounding_box
 
 PIC_DIR = "images"
 ICON_DIR = "icons"
 STROKE_FILE = "out.csv"
+TEMP_DIR = "temp"
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -75,9 +78,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.doodling = False
 
     def classify(self):
+        temp_path = os.path.join(TEMP_DIR, "temp.png")
+        self.image.save(temp_path)
+        result = combine_quickdraw()
+        print(result)
+        top = result[0]
+        pic_path = get_pic_path_by_name(top)
+        x1, y1, x2, y2 = find_bounding_box()
+        rect = QRect(x1, y1, x2-x1, y2-y1)
+        self.insert_pic(pic_path, rect)
+
         with open(STROKE_FILE, "w") as f:
             f.write("")
-        return
 
     def save_image(self):
         # self.canvas.toImage().save("fire.png")

@@ -4,16 +4,16 @@ import numpy as np
 import ast
 import json
 
-# %%
-df = pd.read_csv('./out.csv', header=None)
-# print(df.columns)
-# %%
-# %%
-x = []
-y = []
-for i, row in df.iterrows():
-    x.append(row[0])
-    y.append(row[1])
+# # %%
+# df = pd.read_csv('./out.csv', header=None)
+# # print(df.columns)
+# # %%
+# # %%
+# x = []
+# y = []
+# for i, row in df.iterrows():
+#     x.append(row[0])
+#     y.append(row[1])
 
 # %%
 def find_min(x):
@@ -42,4 +42,4 @@ def find_bounding_box():
     max_y = max(y)
     return min_x, min_y, max_x, max_y
 
-print(find_bounding_box())
+# print(find_bounding_box())

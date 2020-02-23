@@ -27,15 +27,15 @@ tf.set_random_seed(seed=42) # cài đặt seed
 import ast
 
 # owls = pd.read_csv('../input/quickdraw-doodle-recognition/train_simplified/owl.csv')
-owls = pd.read_csv('./test.csv')
-owls = pd.read_csv('./out_standard.csv')
+# owls = pd.read_csv('./test.csv')
+# owls = pd.read_csv('./out_standard.csv')
 # print(owls.columns)
 # owls = owls[owls.recognized]
 # owls['timestamp'] = pd.to_datetime(owls.timestamp)
 # owls = owls.sort_values(by='timestamp', ascending=False)[-100:]
-owls['drawing'] = owls['drawing'].apply(ast.literal_eval)
+# owls['drawing'] = owls['drawing'].apply(ast.literal_eval)
 
-owls.head()
+# owls.head()
 
 # %%
 import matplotlib.pyplot as plt

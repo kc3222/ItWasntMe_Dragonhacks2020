@@ -8,4 +8,4 @@ def combine_quickdraw():
     result = predict_image()
     return result
 
-print(combine_quickdraw())
+# print(combine_quickdraw())
