@@ -8,7 +8,6 @@ import json
 # df = pd.read_csv('./out.csv', header=None)
 # # print(df.columns)
 # # %%
-# # %%
 # x = []
 # y = []
 # for i, row in df.iterrows():
